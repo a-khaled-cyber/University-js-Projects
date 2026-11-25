@@ -1,0 +1,74 @@
+let timerId = null;
+let remaining = 0;
+let isPaused = false;
+const display = document.getElementById("display");
+const pauseResumeButton = document.getElementById("pauseResume");
+
+function stopTimer() {
+  if (timerId !== null) {
+    clearInterval(timerId);
+  }
+  timerId = null;
+}
+
+function updateDisplay() {
+  display.textContent = remaining + " seconds remaining";
+}
+
+function startInterval() {
+  stopTimer();
+  timerId = setInterval(function () {
+    remaining--;
+
+    if (remaining <= 0) {
+      remaining = 0;
+      stopTimer();
+      isPaused = false;
+      pauseResumeButton.disabled = true;
+      pauseResumeButton.textContent = "Pause";
+      display.textContent = "Time is up!";
+    } else {
+      updateDisplay();
+    }
+  }, 1000);
+}
+
+document.getElementById("start").addEventListener("click", function () {
+  stopTimer();
+  remaining = Number(document.getElementById("seconds").value);
+
+  if (!Number.isInteger(remaining) || remaining < 1) {
+    display.textContent = "Enter a positive whole number.";
+    pauseResumeButton.disabled = true;
+    return;
+  }
+
+  isPaused = false;
+  pauseResumeButton.disabled = false;
+  pauseResumeButton.textContent = "Pause";
+  updateDisplay();
+  startInterval();
+});
+
+pauseResumeButton.addEventListener("click", function () {
+  if (timerId !== null) {
+    stopTimer();
+    isPaused = true;
+    pauseResumeButton.textContent = "Resume";
+    display.textContent = "Paused: " + remaining + " seconds remaining";
+  } else if (isPaused && remaining > 0) {
+    isPaused = false;
+    pauseResumeButton.textContent = "Pause";
+    updateDisplay();
+    startInterval();
+  }
+});
+
+document.getElementById("stop").addEventListener("click", function () {
+  stopTimer();
+  remaining = 0;
+  isPaused = false;
+  pauseResumeButton.disabled = true;
+  pauseResumeButton.textContent = "Pause";
+  display.textContent = "Timer stopped.";
+});
