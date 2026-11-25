@@ -1,0 +1,34 @@
+function wait(milliseconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, milliseconds);
+  });
+}
+
+async function requestOrderStatus() {
+  await wait(1500);
+  return "Order confirmed";
+}
+
+async function trackOrder() {
+  const button = document.getElementById("track");
+  const status = document.getElementById("status");
+
+  button.disabled = true;
+
+  try {
+    status.textContent = "Checking order status...";
+    status.textContent = await requestOrderStatus();
+
+    await wait(1500);
+    status.textContent = "Packed";
+
+    await wait(1500);
+    status.textContent = "Out for delivery";
+  } catch (error) {
+    status.textContent = "Unable to check order status.";
+  } finally {
+    button.disabled = false;
+  }
+}
+
+document.getElementById("track").addEventListener("click", trackOrder);
