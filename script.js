@@ -1,58 +1,41 @@
-const items = [];
-const list = document.getElementById("list");
-const count = document.getElementById("count");
-const input = document.getElementById("item");
-const warning = document.getElementById("warning");
+const products = [
+  { name: "Laptop", price: 2500 },
+  { name: "Mouse", price: 45 },
+  { name: "Keyboard", price: 90 },
+  { name: "Laptop Stand", price: 75 },
+  { name: "Monitor", price: 600 }
+];
 
-function renderList() {
-  list.innerHTML = "";
+function showProducts() {
+  const query = document.getElementById("search").value.toLowerCase().trim();
+  const maxPriceValue = document.getElementById("maxPrice").value;
+  const maxPrice = maxPriceValue === "" ? Infinity : Number(maxPriceValue);
 
-  items.forEach(function (item, index) {
-    const li = document.createElement("li");
-    li.textContent = item + " ";
+  const results = document.getElementById("results");
+  results.innerHTML = "";
 
-    const remove = document.createElement("button");
-    remove.textContent = "Remove";
-    remove.addEventListener("click", function () {
-      items.splice(index, 1);
-      warning.textContent = "";
-      renderList();
-    });
+  if (maxPriceValue !== "" && (!Number.isFinite(maxPrice) || maxPrice < 0)) {
+    results.textContent = "Enter a valid maximum price.";
+    return;
+  }
 
-    li.appendChild(remove);
-    list.appendChild(li);
+  const matches = products.filter(function (product) {
+    const matchesName = product.name.toLowerCase().includes(query);
+    const matchesPrice = product.price <= maxPrice;
+    return matchesName && matchesPrice;
   });
 
-  count.textContent = "Total items: " + items.length;
+  matches.forEach(function (product) {
+    const li = document.createElement("li");
+    li.textContent = product.name + " - AED " + product.price;
+    results.appendChild(li);
+  });
+
+  if (matches.length === 0) {
+    results.textContent = "No matching products.";
+  }
 }
 
-document.getElementById("add").addEventListener("click", function () {
-  const value = input.value.trim();
-
-  if (!value) {
-    warning.textContent = "Please enter an item.";
-    return;
-  }
-
-  const alreadyExists = items.some(function (item) {
-    return item.toLowerCase() === value.toLowerCase();
-  });
-
-  if (alreadyExists) {
-    warning.textContent = "This item already exists in the list.";
-    return;
-  }
-
-  items.push(value);
-  input.value = "";
-  warning.textContent = "";
-  renderList();
-});
-
-input.addEventListener("keydown", function (event) {
-  if (event.key === "Enter") {
-    document.getElementById("add").click();
-  }
-});
-
-renderList();
+document.getElementById("search").addEventListener("input", showProducts);
+document.getElementById("maxPrice").addEventListener("input", showProducts);
+showProducts();
