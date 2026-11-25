@@ -1,0 +1,51 @@
+document.getElementById("check").addEventListener("click", function () {
+  const value = document.getElementById("eventDate").value;
+  const result = document.getElementById("result");
+
+  if (!value) {
+    result.textContent = "Select an event date.";
+    return;
+  }
+
+  const [year, month, day] = value.split("-").map(Number);
+  const today = new Date();
+  const startToday = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+  const target = new Date(year, month - 1, day);
+
+  if (
+    target.getFullYear() !== year ||
+    target.getMonth() !== month - 1 ||
+    target.getDate() !== day
+  ) {
+    result.textContent = "Invalid date.";
+    return;
+  }
+
+  const days = Math.round(
+    (Date.UTC(year, month - 1, day) -
+      Date.UTC(
+        startToday.getFullYear(),
+        startToday.getMonth(),
+        startToday.getDate()
+      )) / 86400000
+  );
+
+  const weekdays = [
+    "Sunday", "Monday", "Tuesday", "Wednesday",
+    "Thursday", "Friday", "Saturday"
+  ];
+  const weekday = weekdays[target.getDay()];
+  const dayMessage = "Day of the week: " + weekday + ". ";
+
+  if (days > 0) {
+    result.textContent = dayMessage + days + " day(s) remaining.";
+  } else if (days === 0) {
+    result.textContent = dayMessage + "The event is today!";
+  } else {
+    result.textContent = dayMessage + "The event was " + Math.abs(days) + " day(s) ago.";
+  }
+});
